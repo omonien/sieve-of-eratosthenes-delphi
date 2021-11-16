@@ -54,9 +54,12 @@ begin
    LBitFieldCount := (LBitFieldCount and UInt64($3333333333333333)) +
     ((LBitFieldCount shr 2) and UInt64($3333333333333333));
 
+//This will overflow by design
+{$OVERFLOWCHECKS OFF}
    LBitFieldCount :=
     byte((((LBitFieldCount + (LBitFieldCount shr 4)) and
     UInt64($F0F0F0F0F0F0F0F)) * UInt64($101010101010101)) shr 56);
+{$OVERFLOWCHECKS ON}
 
    result := result + LBitFieldCount;
   end;
