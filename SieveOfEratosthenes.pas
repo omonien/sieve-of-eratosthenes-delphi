@@ -54,9 +54,12 @@ begin
    LBitFieldCount := (LBitFieldCount and UInt64($3333333333333333)) +
     ((LBitFieldCount shr 2) and UInt64($3333333333333333));
 
+//This will overflow by design
+{$OVERFLOWCHECKS OFF}
    LBitFieldCount :=
     byte((((LBitFieldCount + (LBitFieldCount shr 4)) and
     UInt64($F0F0F0F0F0F0F0F)) * UInt64($101010101010101)) shr 56);
+{$OVERFLOWCHECKS ON}
 
    result := result + LBitFieldCount;
   end;
@@ -147,21 +150,23 @@ class function TSieveOfEratosthenes.GetPrimes(const AMaxValue: uint32)
 var
   LPrime: Uint32;
   i: integer;
+  j: UInt32;
 begin
   SetMaxValue(AMaxValue);
   GetPrimeMask;
-  SetLength(result, FMaxValue - NumberOfBitsSet);
+  SetLength(result, NumberOfBitsSet -1);
   result[0] := 2;
   result[1] := 3;
   LPrime := 3;
- 
+
   i := 2;
-  while LPrime <= FMaxValue do
+  while (LPrime <= FMaxValue) and (LPrime > 0) do
   begin
    LPrime := GetNextPrime(LPrime);
    result[i] := LPrime;
    inc(i);
   end;
+  SetLength(Result, i-1);
 end;
 end.
 
